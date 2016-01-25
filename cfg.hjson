@@ -1,0 +1,37 @@
+#hjson (go to http://hjson.org for details)
+{
+  # define the template that fetches the configuration and produces the content for outputFile
+  templateFile: tpl.js
+  outputFile: /etc/haproxy/haproxy.cfg
+
+  # refresh interval in seconds
+  refreshInterval: 5
+
+  # logfile to tail to the console (can be "")
+  logFile: /var/log/haproxy.log
+
+  # run on start/restart to configure rsyslog and launch haproxy
+  startup:
+    '''
+    # prepare and run rsyslog
+    sed 's/#$ModLoad imudp/$ModLoad imudp/' -i /etc/rsyslog.conf
+    sed 's/#$UDPServerRun 514/$UDPServerRun 514\n$UDPServerAddress 127.0.0.1\n/' -i /etc/rsyslog.conf
+    mkdir -p /etc/rsyslog.d/
+    echo -e 'local2.*    /var/log/haproxy.log\n' > /etc/rsyslog.d/haproxy.conf
+    rsyslogd
+
+    # launch haproxy (will log to tail from which it's printed to the console)
+    haproxy -f /etc/haproxy/haproxy.cfg
+    '''
+
+  # to reload a new configuration with minimal service impact and without breaking existing sessions
+  reload: haproxy -f /etc/haproxy/haproxy.cfg -sf $(cat /var/run/haproxy.pid)
+
+  # kill haproxy on shutdown
+  shutdown:
+    '''
+    PID=$(cat /var/run/haproxy.pid)
+    kill -9 $PID
+    wait $PID
+    '''
+}
