@@ -1,43 +1,3 @@
-# consul-haproxy-dyconf
-
-*consul-haproxy-dyconf* is a Docker container that runs [*HAProxy*](http://haproxy.org/) and dynamically updates its configuration with data from [*Consul*](http://consul.io/) using [*dyconf*](https://github.com/laktak/dyconf).
-
-Logs from HAProxy are routed so you can see them with the `docker logs` command or collect them with [logspout](https://hub.docker.com/r/gliderlabs/logspout/).
-
-
-## Usage
-
-```
-usage: -host=HOSTNAME [-port=PORT] -tag=TAGNAME
-
-  -host     Consul host
-  -port     Consul port, default 8500
-  -tag      tag of the docker containers to include
-
-  -config   path to the template configuration
-  -dump     dumps the generated template to the console
-  -q        quiet, no logs
-```
-
-See https://github.com/laktak/dyconf for details.
-
-You would usually run the container with
-
-```
-docker run -d -p 5900:80 laktak/consul-haproxy-dyconf -host=10.1.1.1 -tag=rest
-```
-
-This collects all nodes that are tagged with `rest` from Consul (10.1.1.1 in this sample) and sets up HAProxy to route to them.
-
-E.g. if you have a container running that is named `foo` you can `curl http://HAPROXY/foo/`.
-
-FYI tags can be set manually or by using `env SERVICE_TAGS=...` in combination with [registrator](https://github.com/gliderlabs/registrator).
-
-If you have other requirements you can either fork this repo or supply your own configuraton with `docker run -v $PWD/yourConfig.hjson:/app/config.hjson ...`.
-
-# config.hjson
-
-```
 #hjson (go to http://hjson.org for details)
 {
   # define the controller that fetches the configuration and produces the content for outputFile
@@ -149,4 +109,3 @@ If you have other requirements you can either fork this repo or supply your own 
       stats auth stat:view
     '''
 }
-```
