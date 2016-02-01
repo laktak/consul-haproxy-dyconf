@@ -47,20 +47,14 @@ If you have other requirements you can either fork this repo or supply your own 
   # refresh interval in seconds
   refreshInterval: 5
 
-  # logfile to tail to the console (can be "")
-  logFile: /var/log/haproxy.log
+  # start a syslog server listening on port 514
+  # to redirect logs for Docker
+  syslog: true
 
   # run on start/restart to configure rsyslog and launch haproxy
   startup:
     '''
-    # prepare and run rsyslog
-    sed 's/#$ModLoad imudp/$ModLoad imudp/' -i /etc/rsyslog.conf
-    sed 's/#$UDPServerRun 514/$UDPServerRun 514\n$UDPServerAddress 127.0.0.1\n/' -i /etc/rsyslog.conf
-    mkdir -p /etc/rsyslog.d/
-    echo -e 'local2.*    /var/log/haproxy.log\n' > /etc/rsyslog.d/haproxy.conf
-    rsyslogd
-
-    # launch haproxy (will log to tail from which it's printed to the console)
+    # launch haproxy (will log to syslog from which it's printed to the console)
     haproxy -f /etc/haproxy/haproxy.cfg
     '''
 
@@ -102,9 +96,7 @@ If you have other requirements you can either fork this repo or supply your own 
       maxconn     4000
       user        haproxy
       group       haproxy
-      log 127.0.0.1   local0
-      log 127.0.0.1   local1 notice
-      log 127.0.0.1   local2
+      log 127.0.0.1 format rfc5424 local0 info
 
     defaults
       mode http
