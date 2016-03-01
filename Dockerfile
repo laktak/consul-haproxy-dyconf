@@ -4,7 +4,7 @@ MAINTAINER Christian Zangl, http://github.com/laktak/
 EXPOSE 80 1936
 
 # install node & haproxy
-RUN apk --update add nodejs=4.2.4-r1 haproxy=1.6.2-r0
+RUN apk --update add nodejs=4.3.0-r0 haproxy=1.6.2-r0
 
 COPY config.hjson controller.js package.json /app/
 
