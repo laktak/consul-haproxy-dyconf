@@ -4,11 +4,11 @@ MAINTAINER Christian Zangl, http://github.com/laktak/
 EXPOSE 80 1936
 
 # install node & haproxy
-RUN apk --update add nodejs=4.3.0-r0 haproxy=1.6.2-r0
+RUN apk --update add nodejs=6.2.0-r0 haproxy=1.6.6-r1
 
 COPY config.hjson controller.js package.json /app/
 
 # install dyconf & dependencies
-RUN npm i dyconf@1.0.0 -g && cd /app && npm i
+RUN npm i dyconf@1.1.0 -g && cd /app && npm i
 
 ENTRYPOINT ["/usr/bin/dyconf", "-config=/app/config.hjson"]
